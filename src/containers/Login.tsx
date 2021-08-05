@@ -2,9 +2,7 @@ import { useContext, useRef } from "react";
 import { Redirect } from "react-router";
 import { UserContext } from "../context/UserContext";
 
-interface Props {
-
-}
+interface Props {}
 
 const Login = (props: Props) => {
     const userContext = useContext(UserContext);

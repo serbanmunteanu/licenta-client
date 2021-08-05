@@ -11,4 +11,15 @@ export default class UserService {
             }
         );
     };
+
+    static register = (email: string, password: string, name: string) => {
+        return ServerService.post<AuthenticationResponse>(
+            `/auth/register`,
+            {
+                name,
+                email,
+                password,
+            }
+        );
+    };
 }

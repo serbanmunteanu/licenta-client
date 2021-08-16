@@ -22,7 +22,7 @@ const Category: React.FC<Props> = (props: Props) => {
         <div className="col-md-6 row">
           <span
             onClick={() => {
-              history.push(`/categories/${props.category.id}`);
+              history.push(`/categories/${props.category.id}/posts`);
             }}
             className="link"
           >
@@ -53,7 +53,7 @@ const Category: React.FC<Props> = (props: Props) => {
         <div className="col-md-3">
           <div className="d-flex flex-column">
             <div className="d-flex">
-              <span className="text-left bg-success rounded-circle px-2 text-white d-flex justify-content-center mx-2">
+              <span className="text-left userIcon rounded-circle px-2 text-white d-flex justify-content-center mx-2">
                 {props.category.lastPost.userName?.charAt(0).toUpperCase()}
               </span>
               <span className="fw-light text-secondary fs-6">

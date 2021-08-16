@@ -8,7 +8,7 @@ import UserService from "../data/services/UserService";
 interface UserContextData {
   authVerified: boolean;
   isAuthenticated: boolean;
-  userData: object | null;
+  userData: AuthenticationResponse | null;
   authenticate: (username: string, password: string) => void;
   logout: () => void;
 }
@@ -28,7 +28,7 @@ export const UserContext = React.createContext<UserContextData>({
 const UserProvider = (props: Props) => {
   const [authVerified, setAuthVerified] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userData, setUserData] = useState<object | null>(null);
+  const [userData, setUserData] = useState<AuthenticationResponse | null>(null);
 
   useEffect(() => {
     const auth = LocalStorageService.loadFromLocalStorage(
@@ -38,7 +38,7 @@ const UserProvider = (props: Props) => {
     if (auth) {
       setAuthVerified(true);
       setIsAuthenticated(true);
-      setUserData(auth);
+      setUserData(auth as AuthenticationResponse);
     } else {
       setAuthVerified(false);
       setIsAuthenticated(false);

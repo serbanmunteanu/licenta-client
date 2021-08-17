@@ -1,6 +1,12 @@
 import React from "react";
 
-const ChatContact: React.FC = () => {
+interface ConversationProps {
+  id: number;
+  secondUserName: string;
+  updatedAt: string;
+}
+
+const Conversation: React.FC<ConversationProps> = (conversation: ConversationProps) => {
   return (
     <div className="chat_list">
       <div className="chat_people">
@@ -13,7 +19,7 @@ const ChatContact: React.FC = () => {
         </div>
         <div className="chat_ib">
           <h5>
-            Sunil Rajput <span className="chat_date">Dec 25</span>
+            {conversation.secondUserName} <span className="chat_date">{new Date(conversation.updatedAt).toLocaleString()}</span>
           </h5>
           <p>
             Test, which is a new approach to have all solutions astrology under
@@ -25,4 +31,4 @@ const ChatContact: React.FC = () => {
   );
 }
 
-export default ChatContact;
+export default Conversation;

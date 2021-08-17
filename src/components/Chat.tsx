@@ -6,9 +6,8 @@ interface Props {
 
 const Chat: React.FC<Props> = (props: Props) => {
   useEffect(() => {
-    console.log(props.chatId);
   }, [props.chatId]);
-  
+
   return (
     <div className="mesgs">
       <div className="msg_history">

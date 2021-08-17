@@ -1,17 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Redirect } from "react-router";
 import Chat from "../components/Chat";
-import ChatContact from "../components/ChatContact";
+import Conversation from "../components/ChatContact";
+import { UserContext } from "../context/UserContext";
+import ConversationService from "../data/services/ConversationService";
+
+interface ConversationProps {
+  id: number;
+  secondUserName: string;
+  updatedAt: string;
+}
 
 function Conversations() {
-  const [conversations, setConversations] = useState([1, 2, 3]);
+  const userContext = useContext(UserContext);
+  const [conversations, setConversations] = useState<ConversationProps[]>([]);
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
 
   useEffect(() => {
-    setSelectedChat(conversations[0]);
+    ConversationService.getConversations(userContext.userData ? userContext.userData.token : 'no-token')
+      .then((response: any) => {
+        setConversations(response.data);
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    setSelectedChat(conversations.length !== 0 ? conversations[0].id : null);
   }, []);
 
   return (
-    <>
+    !userContext.isAuthenticated 
+    ? <Redirect to ="/login"/> 
+    : <>
       <div className="container-fluid mx-0 px-0">
         <div className="messaging">
           <div className="inbox_msg">
@@ -42,10 +61,14 @@ function Conversations() {
                       <div
                         key={index}
                         onClick={() => {
-                          setSelectedChat(conversation);
+                          setSelectedChat(conversation.id);
                         }}
                       >
-                        <ChatContact />
+                        <Conversation
+                          id={conversation.id}
+                          secondUserName={conversation.secondUserName}
+                          updatedAt={conversation.updatedAt}
+                        />
                       </div>
                     ))
                   : ""}

@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Redirect } from "react-router";
 import Chat from "../components/Chat";
 import Conversation from "../components/ChatContact";
 import { UserContext } from "../context/UserContext";
@@ -15,22 +14,22 @@ function Conversations() {
   const userContext = useContext(UserContext);
   const [conversations, setConversations] = useState<ConversationProps[]>([]);
   const [selectedChat, setSelectedChat] = useState<number | null>(null);
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     ConversationService.getConversations(userContext.userData ? userContext.userData.token : 'no-token')
       .then((response: any) => {
         setConversations(response.data);
+        setSelectedChat(response.data.length ? response.data[0].id : null);
       })
       .catch((error: any) => {
         console.log(error);
       });
-    setSelectedChat(conversations.length !== 0 ? conversations[0].id : null);
+    setHasLoaded(true);
   }, []);
 
-  return (
-    !userContext.isAuthenticated 
-    ? <Redirect to ="/login"/> 
-    : <>
+  return hasLoaded 
+      ? <>
       <div className="container-fluid mx-0 px-0">
         <div className="messaging">
           <div className="inbox_msg">
@@ -74,12 +73,12 @@ function Conversations() {
                   : ""}
               </div>
             </div>
-            <Chat chatId={selectedChat} />
+            <Chat chatId={hasLoaded ? selectedChat : null} />
           </div>
         </div>
       </div>
     </>
-  );
+    : <div>loading</div>
 }
 
 export default Conversations;

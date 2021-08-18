@@ -6,4 +6,10 @@ export default class ConversationService {
       headers: { Authorization: ticket },
     });
   };
+
+  static getConversationMessages = (ticket: string, conversationId: number) => {
+    return ServerService.get(`/conversations/${conversationId}/messages`, {
+      headers: { Authorization: ticket },
+    });
+  };
 }

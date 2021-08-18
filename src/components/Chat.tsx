@@ -1,92 +1,87 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { UserContext } from "../context/UserContext";
+import ConversationService from "../data/services/ConversationService";
+import IncomingMessage from "./IncomingMessage";
+import OutcomingMessage from "./OutcomingMessage";
 
 interface Props {
   chatId: number | null;
 }
 
+interface ConversationMessagesProps {
+  id: number;
+  content: string;
+  userName: string;
+  userId: number;
+  createdAt: string;
+}
+
 const Chat: React.FC<Props> = (props: Props) => {
+  const userContext = useContext(UserContext);
+  const [conversationMessages, setConversationMessages] = useState<
+    ConversationMessagesProps[]
+  >([]);
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
+
   useEffect(() => {
+    if (props.chatId) {
+      ConversationService.getConversationMessages(
+        userContext.userData ? userContext.userData.token : "no-auth",
+        props.chatId
+      )
+        .then((response) => {
+          setConversationMessages(response.data);
+          setHasLoaded(true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }, [props.chatId]);
 
-  return (
-    <div className="mesgs">
-      <div className="msg_history">
-        <div className="incoming_msg">
-          <div className="incoming_msg_img">
-            {" "}
-            <img
-              src="https://ptetutorials.com/images/user-profile.png"
-              alt="sunil"
-            />{" "}
-          </div>
-          <div className="received_msg">
-            <div className="received_withd_msg">
-              <p>Test which is a new approach to have all solutions</p>
-              <span className="time_date"> 11:01 AM | June 9</span>
-            </div>
-          </div>
+  if (!hasLoaded) {
+    return <div>...loading</div>;
+  }
+
+  if (conversationMessages.length) {
+    return (
+      <div className="mesgs">
+        <div className="msg_history">
+          {conversationMessages.map((conversationMessage) => {
+            if (conversationMessage.userId === userContext.userData?.id) {
+              return (
+                <OutcomingMessage
+                  date={conversationMessage.createdAt}
+                  content={conversationMessage.content}
+                />
+              );
+            } else {
+              return (
+                <IncomingMessage
+                  date={conversationMessage.createdAt}
+                  content={conversationMessage.content}
+                />
+              );
+            }
+          })}
         </div>
-        <div className="outgoing_msg">
-          <div className="sent_msg">
-            <p>Test which is a new approach to have all solutions</p>
-            <span className="time_date"> 11:01 AM | June 9</span>{" "}
-          </div>
-        </div>
-        <div className="incoming_msg">
-          <div className="incoming_msg_img">
-            {" "}
-            <img
-              src="https://ptetutorials.com/images/user-profile.png"
-              alt="sunil"
-            />{" "}
-          </div>
-          <div className="received_msg">
-            <div className="received_withd_msg">
-              <p>Test, which is a new approach to have</p>
-              <span className="time_date"> 11:01 AM | Yesterday</span>
-            </div>
-          </div>
-        </div>
-        <div className="outgoing_msg">
-          <div className="sent_msg">
-            <p>Apollo University, Delhi, India Test</p>
-            <span className="time_date"> 11:01 AM | Today</span>{" "}
-          </div>
-        </div>
-        <div className="incoming_msg">
-          <div className="incoming_msg_img">
-            {" "}
-            <img
-              src="https://ptetutorials.com/images/user-profile.png"
-              alt="sunil"
-            />{" "}
-          </div>
-          <div className="received_msg">
-            <div className="received_withd_msg">
-              <p>
-                We work directly with our designers and suppliers, and sell
-                direct to you, which means quality, exclusive products, at a
-                price anyone can afford.
-              </p>
-              <span className="time_date"> 11:01 AM | Today</span>
-            </div>
+        <div className="type_msg">
+          <div className="input_msg_write">
+            <input
+              type="text"
+              className="write_msg"
+              placeholder="Type a message"
+            />
+            <button className="msg_send_btn" type="button">
+              <i className="fa fa-paper-plane-o" aria-hidden="true"></i>
+            </button>
           </div>
         </div>
       </div>
-      <div className="type_msg">
-        <div className="input_msg_write">
-          <input
-            type="text"
-            className="write_msg"
-            placeholder="Type a message"
-          />
-          <button className="msg_send_btn" type="button">
-            <i className="fa fa-paper-plane-o" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  } else {
+    return <div>no messages</div>;
+  }
 };
 
 export default Chat;

@@ -23,7 +23,7 @@ const SocketProvider = (props: Props) => {
         if (userData) {
             const newSocket = io(
                 `${API_BASE_URL}/relay`,
-                { query: { userId: userData.id }}
+                { query: { userId: userData.id.toString() }}
             );
             setSocket(newSocket);
             return (): void => { newSocket.close() };

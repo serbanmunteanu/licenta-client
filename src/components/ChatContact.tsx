@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ConversationProps {
-  id: number;
+  conversationId: number;
   secondUserName: string;
   updatedAt: string;
 }

@@ -1,5 +1,8 @@
+import { useContext } from "react";
 import { Route, Switch } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { ConversationsProvider } from "../context/ConversationsProvider";
+import { UserContext } from "../context/UserContext";
 import Conversations from "./Conversations";
 import Homepage from "./Homepage";
 import Login from "./Login";
@@ -9,8 +12,9 @@ import Register from "./Register";
 interface Props {}
 
 const Main = (props: Props) => {
+  const userContext = useContext(UserContext);
   return (
-    <>  
+    <>
       <Navbar />
       <Switch>
         <Route path="/login">
@@ -22,9 +26,13 @@ const Main = (props: Props) => {
         <Route exact path="/categories/:categoryId/posts">
           <Posts />
         </Route>
-        <Route exact path="/conversations">
-          <Conversations />
-        </Route>
+        {userContext.userData && (
+          <Route exact path="/conversations">
+            <ConversationsProvider token={userContext.userData.token}>
+              <Conversations />
+            </ConversationsProvider>
+          </Route>
+        )}
         <Route exact path="/">
           <Homepage />
         </Route>

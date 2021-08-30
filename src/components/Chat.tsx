@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useSocket } from "../context/SocketContext";
 import { UserContext } from "../context/UserContext";
 import ConversationService from "../data/services/ConversationService";
 import IncomingMessage from "./IncomingMessage";
@@ -9,9 +10,7 @@ interface Props {
 }
 
 interface ConversationMessagesProps {
-  id: number;
   content: string;
-  userName: string;
   userId: number;
   createdAt: string;
 }
@@ -22,6 +21,8 @@ const Chat: React.FC<Props> = (props: Props) => {
     ConversationMessagesProps[]
   >([]);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
+  const { socket } = useSocket();
+  const [text, setText] = useState("");
 
   useEffect(() => {
     if (props.chatId) {
@@ -37,7 +38,27 @@ const Chat: React.FC<Props> = (props: Props) => {
           console.log(error);
         });
     }
+  
   }, [props.chatId]);
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+    const message = {
+      conversationId: props.chatId,
+      content: text,
+      sender: userContext.userData?.id,
+      createdAt: new Date(),
+    };
+    if (socket) {
+      socket.emit("send-message", message);
+      setText('');
+    }
+    setConversationMessages([...conversationMessages, {
+      content: message.content,
+      userId: message.sender ? message.sender : 0,
+      createdAt: message.createdAt.toString(),
+    }])
+  };
 
   if (!hasLoaded) {
     return <div>...loading</div>;
@@ -71,8 +92,14 @@ const Chat: React.FC<Props> = (props: Props) => {
               type="text"
               className="write_msg"
               placeholder="Type a message"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
             />
-            <button className="msg_send_btn" type="button">
+            <button
+              className="msg_send_btn"
+              type="button"
+              onClick={(e) => handleSubmit(e)}
+            >
               <i className="fa fa-paper-plane-o" aria-hidden="true"></i>
             </button>
           </div>

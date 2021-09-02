@@ -1,38 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import Chat from "../components/Chat";
 import Conversation from "../components/ChatContact";
 import { useConversations } from "../context/ConversationsProvider";
-import { useSocket } from "../context/SocketContext";
-import { UserContext } from "../context/UserContext";
-import ConversationService from "../data/services/ConversationService";
-
-interface ConversationProps {
-  id: number;
-  secondUserName: string;
-  updatedAt: string;
-}
 
 function Conversations() {
-  const { conversations } = useConversations();
-  // const userContext = useContext(UserContext);
-  // const [conversations, setConversations] = useState<ConversationProps[]>([]);
-  // const [selectedChat, setSelectedChat] = useState<number | null>(null);
-  // const [hasLoaded, setHasLoaded] = useState<boolean>(false);
-  // const { socket } = useSocket();
+  const { conversations, selectedConversation } = useConversations();
 
-  // useEffect(() => {
-  //   ConversationService.getConversations(userContext.userData ? userContext.userData.token : 'no-token')
-  //     .then((response: any) => {
-  //       setConversations(response.data);
-  //       setSelectedChat(response.data.length ? response.data[0].id : null);
-  //     })
-  //     .catch((error: any) => {
-  //       console.log(error);
-  //     });
-  //   setHasLoaded(true);
-  // }, []);
-
-  return <>
+return <>
       <div className="container-fluid mx-0 px-0">
         <div className="messaging">
           <div className="inbox_msg">
@@ -67,13 +41,14 @@ function Conversations() {
                           conversationId={conversation.conversationId}
                           secondUserName={conversation.secondUserName}
                           updatedAt={conversation.updatedAt}
+                          conversationIndex={index}
                         />
                       </div>
                     ))
                   : ""}
               </div>
             </div>
-            <Chat chatId={0} />
+            <Chat conversation={selectedConversation} />
           </div>
         </div>
       </div>

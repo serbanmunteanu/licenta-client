@@ -1,14 +1,7 @@
 export default class LocalStorageService {
-    static saveToLocalStorage(key: string, data: object | null, expiration: number = 60): object | null {
+    static saveToLocalStorage(key: string, data: object | null): object | null {
         try {
-            const expirationMs = expiration * 60 * 1000;
-            const record = {
-                value: JSON.stringify(data),
-                timestamp: new Date().getTime() + expirationMs,
-            };
-
-            const serialized = JSON.stringify(record);
-            localStorage.setItem(key, serialized);
+            localStorage.setItem(key, JSON.stringify(data));
             return data;
         } catch (e) {
             console.warn('Could not save to local storage', e);
@@ -16,23 +9,20 @@ export default class LocalStorageService {
         }
     }
 
-    static loadFromLocalStorage(key: string): object | void {
+    static loadFromLocalStorage(key: string): object | null {
         try {
             const serialized = localStorage.getItem(key);
             if (serialized === null) {
-                return undefined;
-            } else {
-                const record = JSON.parse(serialized);
-                let date = (new Date()).getTime() < record.timestamp && JSON.parse(record.value);
-                if (date === {} || date === undefined || date === false) {
-                    localStorage.removeItem(key);
-                    date = undefined;
-                }
-                return date;
-            }
+                return null;
+            } 
+            return JSON.parse(serialized);
         } catch (e) {
             console.warn('Error loading form storage', e);
-            return undefined;
+            return null;
         }
+    }
+
+    static deleteFromLocalStorage(key: string): void {
+        localStorage.removeItem(key);
     }
 }

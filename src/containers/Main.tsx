@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { ConversationsProvider } from "../context/ConversationsProvider";
 import { UserContext } from "../context/UserContext";
@@ -12,11 +12,15 @@ import Register from "./Register";
 interface Props {}
 
 const Main = (props: Props) => {
-  const userContext = useContext(UserContext);
+  const { userData } = useContext(UserContext);
+
   return (
     <>
       <Navbar />
       <Switch>
+        <Route exact path="/">
+          <Homepage />
+        </Route>
         <Route path="/login">
           <Login />
         </Route>
@@ -26,16 +30,15 @@ const Main = (props: Props) => {
         <Route exact path="/categories/:categoryId/posts">
           <Posts />
         </Route>
-        {userContext.userData && (
+        {userData ? (
           <Route exact path="/conversations">
-            <ConversationsProvider token={userContext.userData.token}>
+            <ConversationsProvider token={userData.token}>
               <Conversations />
             </ConversationsProvider>
           </Route>
+        ) : (
+          <Redirect to="/login" />
         )}
-        <Route exact path="/">
-          <Homepage />
-        </Route>
       </Switch>
     </>
   );

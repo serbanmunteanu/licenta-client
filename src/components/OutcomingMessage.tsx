@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface Props {
-    date: string;
+    date: Date;
     content: string;
 }
 
@@ -10,7 +10,7 @@ function OutcomingMessage(props: Props) {
         <div className="outgoing_msg">
             <div className="sent_msg">
               <p>{props.content}</p>
-              <span className="time_date">{new Date(props.date).toLocaleString()}</span>{" "}
+              <span className="time_date">{props.date.toLocaleString()}</span>{" "}
             </div>
           </div>
     )

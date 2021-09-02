@@ -2,7 +2,7 @@ import React from 'react'
 
 interface Props {
     content: string;
-    date: string;
+    date: Date;
 }
 
 function IncomingMessage(props: Props) {
@@ -18,7 +18,7 @@ function IncomingMessage(props: Props) {
         <div className="received_msg">
           <div className="received_withd_msg">
             <p>{props.content}</p>
-            <span className="time_date"> {new Date(props.date).toLocaleString() }</span>
+            <span className="time_date"> {props.date.toLocaleString() }</span>
           </div>
         </div>
       </div>

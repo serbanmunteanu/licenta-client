@@ -2,9 +2,11 @@ import React, { EffectCallback, useContext, useEffect, useState } from "react";
 import { API_BASE_URL } from "../data/const";
 import { io, Socket } from "socket.io-client";
 import { UserContext } from "./UserContext";
+import { ConversationMessageProps } from "./ConversationsProvider";
 
 interface SocketIOContextData {
   socket: Socket | null;
+  sendMessage: (message: ConversationMessageProps) => void;
 }
 
 interface Props {
@@ -13,6 +15,7 @@ interface Props {
 
 const SocketIOContext = React.createContext<SocketIOContextData>({
   socket: null,
+  sendMessage: () => {}
 });
 
 export function useSocket() {
@@ -35,8 +38,14 @@ const SocketProvider = (props: Props) => {
     }
   }, [userData]);
 
+  const sendMessage = (message: ConversationMessageProps) => {
+    if (socket) {
+      socket.emit("send-message", { message });
+    }
+  };
+
   return (
-    <SocketIOContext.Provider value={{ socket }}>
+    <SocketIOContext.Provider value={{ socket, sendMessage }}>
       {props.children}
     </SocketIOContext.Provider>
   );

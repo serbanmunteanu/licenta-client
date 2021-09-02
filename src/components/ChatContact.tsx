@@ -1,14 +1,18 @@
 import React from "react";
+import { useConversations } from "../context/ConversationsProvider";
 
 interface ConversationProps {
   conversationId: number;
   secondUserName: string;
   updatedAt: string;
+  conversationIndex: number;
 }
 
 const Conversation: React.FC<ConversationProps> = (conversation: ConversationProps) => {
+  const { setSelectedConversationIndex } = useConversations();
+
   return (
-    <div className="chat_list">
+    <div className="chat_list" onClick={() => {setSelectedConversationIndex(conversation.conversationIndex)}}>
       <div className="chat_people">
         <div className="chat_img">
           {" "}

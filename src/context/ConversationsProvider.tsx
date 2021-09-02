@@ -1,25 +1,24 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import Conversation from "../components/ChatContact";
+import React, { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 import ConversationService from "../data/services/ConversationService";
 import { useSocket } from "./SocketContext";
 
-interface ConversationMessageProps {
+export interface ConversationMessageProps {
   content: string;
   userId: number;
-  createdAt: string;
+  createdAt: Date;
 }
 
-interface ConversationsProps {
+export interface ConversationsProps {
   conversationId: number;
   secondUserName: string;
   updatedAt: string;
-  messages: ConversationMessageProps[];
 }
 
 interface IConversationsContext {
   conversations: ConversationsProps[];
   sendMessage: (conversationId: number, message: ConversationMessageProps) => void;
-  selectedConversation: ConversationsProps
+  selectedConversation: ConversationsProps,
+  setSelectedConversationIndex: Dispatch<SetStateAction<number>>
 }
 
 interface ConversationProviderProps {
@@ -48,7 +47,6 @@ export const ConversationsProvider: React.FC<ConversationProviderProps> = ({
         (conversation) => conversation.conversationId === conversationId
       );
       const newConversations = conversations;
-      newConversations[conversationIndex].messages.push(message);
       setConversations(newConversations);
     },
     [setConversations]
@@ -78,6 +76,7 @@ export const ConversationsProvider: React.FC<ConversationProviderProps> = ({
   const value = {
     conversations,
     sendMessage,
+    setSelectedConversationIndex,
     selectedConversation: conversations[selectedConversationIndex]
   };
 

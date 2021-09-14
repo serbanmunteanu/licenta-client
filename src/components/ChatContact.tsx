@@ -9,10 +9,8 @@ interface ConversationProps {
 }
 
 const Conversation: React.FC<ConversationProps> = (conversation: ConversationProps) => {
-  const { setSelectedConversationIndex } = useConversations();
-
   return (
-    <div className="chat_list" onClick={() => {setSelectedConversationIndex(conversation.conversationIndex)}}>
+    <div className="chat_list" >
       <div className="chat_people">
         <div className="chat_img">
           {" "}
@@ -25,10 +23,6 @@ const Conversation: React.FC<ConversationProps> = (conversation: ConversationPro
           <h5>
             {conversation.secondUserName} <span className="chat_date">{new Date(conversation.updatedAt).toLocaleString()}</span>
           </h5>
-          <p>
-            Test, which is a new approach to have all solutions astrology under
-            one roof.
-          </p>
         </div>
       </div>
     </div>

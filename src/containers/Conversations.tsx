@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Chat from "../components/Chat";
 import Conversation from "../components/ChatContact";
-import { useConversations } from "../context/ConversationsProvider";
+import {
+  ConversationsProps,
+  useConversations,
+} from "../context/ConversationsProvider";
+import { UserContext } from "../context/UserContext";
+import ConversationService from "../data/services/ConversationService";
 
-function Conversations() {
-  const { conversations, selectedConversation } = useConversations();
+interface Props {
+  token: string;
+  userId: number;
+}
+function Conversations(props: Props) {
+  const { checkTicketValability } = useContext(UserContext);
+  const [conversations, setConversations] = useState<ConversationsProps[]>([]);
+  const [selectedConversationIndex, setSelectedConversationIndex] =
+    useState<number>(0);
 
-return <>
+  useEffect(() => {
+    checkTicketValability();
+    ConversationService.getConversations(props.token)
+      .then((response) => {
+        setConversations(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [props.token]);
+
+  return (
+    <>
       <div className="container-fluid mx-0 px-0">
         <div className="messaging">
           <div className="inbox_msg">
@@ -36,6 +60,9 @@ return <>
                   ? conversations.map((conversation, index) => (
                       <div
                         key={index}
+                        onClick={(e) => {
+                          setSelectedConversationIndex(index);
+                        }}
                       >
                         <Conversation
                           conversationId={conversation.conversationId}
@@ -48,11 +75,18 @@ return <>
                   : ""}
               </div>
             </div>
-            <Chat conversation={selectedConversation} />
+            <Chat
+              conversationId={
+                conversations[selectedConversationIndex]?.conversationId
+              }
+              token={props.token}
+              userId={props.userId}
+            />
           </div>
         </div>
       </div>
     </>
+  );
 }
 
 export default Conversations;

@@ -1,8 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  ConversationMessageProps,
-  ConversationsProps,
-} from "../context/ConversationsProvider";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { ConversationMessageProps } from "../context/ConversationsProvider";
 import { useSocket } from "../context/SocketContext";
 import { UserContext } from "../context/UserContext";
 import ConversationService from "../data/services/ConversationService";
@@ -10,60 +7,75 @@ import IncomingMessage from "./IncomingMessage";
 import OutcomingMessage from "./OutcomingMessage";
 
 interface Props {
-  conversation: ConversationsProps;
+  conversationId: number | null;
+  token: string;
+  userId: number;
 }
 
 const Chat: React.FC<Props> = (props: Props) => {
   const { userData, checkTicketValability } = useContext(UserContext);
-  const { socket, sendMessage } = useSocket();
   const [text, setText] = useState<string>("");
   const [conversationMessages, setConversationMessages] = useState<
     ConversationMessageProps[]
   >([]);
+  const { socket } = useSocket();
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     checkTicketValability();
-    if (userData && props.conversation) {
+    if (props.conversationId) {
       ConversationService.getConversationMessages(
-        userData.token,
-        props.conversation?.conversationId
+        props.token,
+        props.conversationId
       )
-        .then((response: any) => {
+        .then((response) => {
           setConversationMessages(response.data);
+          if (socket) {
+            socket.emit("join-room", { conversationId: props.conversationId });
+          }
+          scrollToBottom();
         })
         .catch((error) => {
           console.log(error);
         });
     }
-  }, [props.conversation]);
+  }, [props.conversationId]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+  };
 
   useEffect(() => {
     if (socket) {
-      socket.on('receive-message', ({ message}) => {
-        console.log(message);
-      })
+      socket.on("receive-message", (message) => {
+        onReceiveMessage(message);
+      });
     }
-  },[socket])
+  }, [socket, conversationMessages]);
 
-  const handleSubmit = (event: any) => {
-    if (userData) {
-      event.preventDefault();
-      const message = {
-        conversationId: props.conversation.conversationId,
-        content: text,
-        userId: userData.id,
-        createdAt: new Date(),
-      };
-      sendMessage(message);
-      setConversationMessages([
-        ...conversationMessages,
-        {
-          content: message.content,
-          userId: message.userId,
-          createdAt: message.createdAt,
-        },
-      ]);
+  const onReceiveMessage = (message: any) => {
+    console.log(message);
+    addMesage(message);
+    scrollToBottom();
+  };
+
+  const sendMessage = (message: any) => {
+    if (socket) {
+      socket.emit("send-message", { message });
+      setText("");
     }
+  };
+
+  const addMesage = (message: any) => {
+    const newMessages = [
+      ...conversationMessages,
+      {
+        content: message.content,
+        userId: message.userId,
+        createdAt: message.createdAt,
+      },
+    ];
+    setConversationMessages(newMessages);
   };
 
   return (
@@ -87,6 +99,7 @@ const Chat: React.FC<Props> = (props: Props) => {
               );
             }
           })}
+          <div ref={messagesEndRef}>{""}</div>
         </div>
       ) : (
         <div className="msg_history">Start conversation now</div>
@@ -103,7 +116,14 @@ const Chat: React.FC<Props> = (props: Props) => {
           <button
             className="msg_send_btn"
             type="button"
-            onClick={(e) => handleSubmit(e)}
+            onClick={(e) => {
+              e.preventDefault();
+              sendMessage({
+                conversationId: props.conversationId,
+                content: text,
+                userId: props.userId,
+              });
+            }}
           >
             <i className="fa fa-paper-plane-o" aria-hidden="true"></i>
           </button>

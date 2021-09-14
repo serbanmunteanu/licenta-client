@@ -32,9 +32,7 @@ const Main = (props: Props) => {
         </Route>
         {userData ? (
           <Route exact path="/conversations">
-            <ConversationsProvider token={userData.token}>
-              <Conversations />
-            </ConversationsProvider>
+              <Conversations token={userData.token} userId={userData.id}/>
           </Route>
         ) : (
           <Redirect to="/login" />

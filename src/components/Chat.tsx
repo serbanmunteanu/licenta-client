@@ -19,6 +19,9 @@ const Chat: React.FC<Props> = (props: Props) => {
     ConversationMessageProps[]
   >([]);
   const { socket } = useSocket();
+  const [sentimentScore, setSentimentScore] = useState<number>(0);
+  const [lastMessageSentimentScore, setLastMessageSentimentScore] =
+    useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -30,9 +33,7 @@ const Chat: React.FC<Props> = (props: Props) => {
       )
         .then((response) => {
           setConversationMessages(response.data);
-          if (socket) {
-            socket.emit("join-room", { conversationId: props.conversationId });
-          }
+          joinRoom();
           scrollToBottom();
         })
         .catch((error) => {
@@ -40,10 +41,6 @@ const Chat: React.FC<Props> = (props: Props) => {
         });
     }
   }, [props.conversationId]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-  };
 
   useEffect(() => {
     if (socket) {
@@ -53,8 +50,40 @@ const Chat: React.FC<Props> = (props: Props) => {
     }
   }, [socket, conversationMessages]);
 
+  useEffect(() => {
+    if (conversationMessages.length) {
+      computeSentimentScore();
+    }
+  }, [conversationMessages]);
+
+  const computeSentimentScore = () => {
+    let conversationScore = 0;
+    let converationMessageReceived = 0;
+    conversationMessages.forEach((message) => {
+      if (userData && message.userId !== userData.id) {
+        conversationScore += message.sentimentScore;
+        converationMessageReceived++;
+      }
+    });
+    if (converationMessageReceived > 0) {
+      setSentimentScore(conversationScore / converationMessageReceived);
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+  };
+
+  const joinRoom = () => {
+    if (socket) {
+      socket.emit("join-room", { conversationId: props.conversationId });
+    }
+  };
+
   const onReceiveMessage = (message: any) => {
-    console.log(message);
+    if (userData && message.userId !== userData.id) {
+      setLastMessageSentimentScore(message.sentimentScore);
+    }
     addMesage(message);
     scrollToBottom();
   };
@@ -66,13 +95,14 @@ const Chat: React.FC<Props> = (props: Props) => {
     }
   };
 
-  const addMesage = (message: any) => {
+  const addMesage = (message: ConversationMessageProps) => {
     const newMessages = [
       ...conversationMessages,
       {
         content: message.content,
         userId: message.userId,
         createdAt: message.createdAt,
+        sentimentScore: message.sentimentScore,
       },
     ];
     setConversationMessages(newMessages);
@@ -105,7 +135,17 @@ const Chat: React.FC<Props> = (props: Props) => {
         <div className="msg_history">Start conversation now</div>
       )}
       <div className="type_msg">
-        <div className="input_msg_write">
+        <div className="input_msg_write d-flex flex-row">
+          { (userData && userData.isAdmin) && (
+            <div className="p-2 d-flex flex-column">
+              <span className="sentimentScore px-1">
+                {sentimentScore.toFixed(2)}
+              </span>
+              <span className="sentimentScore px-1">
+                {lastMessageSentimentScore.toFixed(2)}
+              </span>
+            </div>
+          )}
           <input
             type="text"
             className="write_msg"

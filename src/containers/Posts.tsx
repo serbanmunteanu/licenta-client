@@ -36,7 +36,7 @@ const Posts = () => {
   return (
     <>
       <div className="container container1170" id="content">
-        <h5 className="p-4">CATEGORIES</h5>
+        <h5 className="p-4">POSTS</h5>
         <div className="category col-lg-12">
             <ul className="topic-list">
             {category ? (

@@ -5,6 +5,7 @@ export interface ConversationMessageProps {
   content: string;
   userId: number;
   createdAt: Date;
+  sentimentScore: number;
 }
 
 export interface ConversationsProps {

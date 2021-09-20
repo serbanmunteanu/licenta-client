@@ -10,60 +10,78 @@ const Category: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div className="row ps-5 pb-4">
-        <div className="col-md-1 d-flex justify-content-center">
-          <span className={`bg-${props.category.color} bg-gradient rounded-circle px-3 py-2`}>
-            <i
-              className={`bi bi-${props.category.image}`}
-              style={{ fontSize: "1.7rem", color: "white" }}
-            ></i>
-          </span>
-        </div>
-        <div className="col-md-6 row">
-          <span
-            onClick={() => {
-              history.push(`/categories/${props.category.id}/posts`);
-            }}
-            className="link"
-          >
-            {props.category.name}
-          </span>
-          <span className="text-muted">{props.category.shortDescription}</span>
-        </div>
-        <div className={`col-md-2 border-end border-${props.category.color} border-4`}>
-          <div className="d-flex justify-content-between">
-            <div className="d-flex flex-column">
-              <span className="text-center fs-5">
-                {props.category.postsNumber}
-              </span>
-              <span className="text-center fw-light text-secondary fs-6">
-                TOPICS
-              </span>
+         <li
+        style={{
+          paddingLeft: "-15px",
+          paddingRight: "-15px",
+          listStyleType: "none",
+        }}
+      >
+        <div className="row clearfix category-item">
+          <div className="col-md-6 col-sm-9 col-xs-10 content">
+            <div className="avatar pull-left">
+              <a href="/user/admin" className="pull-left">
+                <span className="avatar not-responsive avatar-rounded postIcon fs-3">
+                  {props.category.image}
+                </span>
+              </a>
             </div>
-            <div className="d-flex flex-column">
-              <span className="text-center fs-5">
-                {props.category.commentsNumber}
-              </span>
-              <span className="text-center fw-light text-secondary fs-6">
-                POSTS
-              </span>
+            <h2 className="topicHeader">
+              <a
+                className="fs-5"
+                href={`/categories/${props.category.id}/posts`}
+                style={{ textDecoration: "none", color: "#6c757d" }}
+              >
+                {props.category.name}
+              </a>
+              <br />
+              <small
+                className="hidden-xs miniFontSize"
+                style={{
+                  color: "#6c757d !important",
+                  textDecoration: "none !important",
+                }}
+              >
+                <span className="timeago" style={{ color: "#6c757d" }}>
+                  {props.category.shortDescription}
+                </span>
+              </small>
+            </h2>
+          </div>
+          <div className="col-md-1 hidden-sm hidden-xs stats">
+            <span className="human-readable-number">
+              {props.category.postsNumber}
+            </span>
+            <br />
+            <small>TOPICS</small>
+          </div>
+          <div className="col-md-1 hidden-sm hidden-xs stats">
+            <span className="human-readable-number">{props.category.commentsNumber}</span>
+            <br />
+            <small>POSTS</small>
+          </div>
+          <div className="col-md-3 col-sm-3 teaser hidden-xs">
+            <div className="card cardPost background-link-container">
+              <a className="background-link" href="/topic/8/emoji-usage/1"></a>
+              <p>
+                <a href="/user/admin">
+                  <span
+                    className="avatar not-responsive avatar-rounded"
+                  >
+                    {props.category.lastPost.userName.charAt(0).toUpperCase()}
+                  </span>
+                </a>
+                <a className="permalink" href="/topic/8/emoji-usage/1">
+                  <span className="timeago">{new Date(props.category.lastPost.updatedAt).toLocaleString()}</span>
+                </a>
+              </p>
+              <div className="post-content">
+                {props.category.lastPost.text}
+              </div>
             </div>
           </div>
         </div>
-        <div className="col-md-3">
-          <div className="d-flex flex-column">
-            <div className="d-flex">
-              <span className="text-left userIcon rounded-circle px-2 text-white d-flex justify-content-center mx-2">
-                {props.category.lastPost.userName?.charAt(0).toUpperCase()}
-              </span>
-              <span className="fw-light text-secondary fs-6">
-                {new Date(props.category.lastPost.updatedAt).toLocaleString()}{" "}
-              </span>
-            </div>
-            <div>{props.category.lastPost?.text.substring(0, 30)}</div>
-          </div>
-        </div>
-      </div>
+      </li>
     </>
   );
 };

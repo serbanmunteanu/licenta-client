@@ -5,5 +5,6 @@ export interface AuthenticationResponse {
     phone: string;
     token: string;
     isActive: boolean;
+    isAdmin: boolean;
     canReply: boolean;
 }
